@@ -24,14 +24,14 @@ export function CategoryField({
     <div className="grid gap-2">
       <Label htmlFor="category">Category</Label>
       <Select
-        value={categoryId || ''}
-        onValueChange={(value) => onCategoryChange(value || null)}
+        value={categoryId || 'none'}
+        onValueChange={(value) => onCategoryChange(value === 'none' ? null : value)}
       >
         <SelectTrigger id="category">
           <SelectValue placeholder="Select a category" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">No Category</SelectItem>
+          <SelectItem value="none">No Category</SelectItem>
           {categories.map((category) => (
             <SelectItem key={category.id} value={category.id}>
               <div className="flex items-center gap-2">
