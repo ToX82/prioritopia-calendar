@@ -8,23 +8,47 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { PlusIcon, ListIcon, CalendarIcon, MenuIcon, LayoutGridIcon, TagIcon, XIcon } from 'lucide-react';
+import { PlusIcon, ListIcon, CalendarIcon, MenuIcon, LayoutGridIcon, XIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { CategoryItem } from './category-item';
+import { CategoryDialog } from './category-dialog';
+import { DeleteCategoryDialog } from './delete-category-dialog';
 
 interface AppSidebarProps {
-  onAddCategory: () => void;
-  onSelectCategory: (categoryId: string | null) => void;
   selectedCategoryId: string | null;
+  onSelectCategory: (categoryId: string | null) => void;
 }
 
 export function AppSidebar({
-  onAddCategory,
   onSelectCategory,
   selectedCategoryId,
 }: AppSidebarProps) {
   const [open, setOpen] = useState(false);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [deleteCategoryDialogOpen, setDeleteCategoryDialogOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryToDelete, setCategoryToDelete] = useState<{ id: string, name: string } | null>(null);
+  
   const { categories, viewMode, setViewMode } = useAppStore();
+  
+  const handleAddCategory = () => {
+    setEditingCategory(null);
+    setCategoryDialogOpen(true);
+  };
+  
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setCategoryDialogOpen(true);
+  };
+  
+  const handleDeleteCategory = (categoryId: string) => {
+    const category = categories.find(c => c.id === categoryId);
+    if (category) {
+      setCategoryToDelete({ id: category.id, name: category.name });
+      setDeleteCategoryDialogOpen(true);
+    }
+  };
   
   return (
     <>
@@ -47,7 +71,9 @@ export function AppSidebar({
               onSelectCategory(categoryId);
               setOpen(false);
             }}
-            onAddCategory={onAddCategory}
+            onAddCategory={handleAddCategory}
+            onEditCategory={handleEditCategory}
+            onDeleteCategory={handleDeleteCategory}
             viewMode={viewMode}
             setViewMode={(mode) => {
               setViewMode(mode);
@@ -64,12 +90,31 @@ export function AppSidebar({
             categories={categories}
             selectedCategoryId={selectedCategoryId}
             onSelectCategory={onSelectCategory}
-            onAddCategory={onAddCategory}
+            onAddCategory={handleAddCategory}
+            onEditCategory={handleEditCategory}
+            onDeleteCategory={handleDeleteCategory}
             viewMode={viewMode}
             setViewMode={setViewMode}
           />
         </div>
       </aside>
+      
+      {/* Category Dialog */}
+      <CategoryDialog
+        open={categoryDialogOpen}
+        onOpenChange={setCategoryDialogOpen}
+        initialCategory={editingCategory}
+      />
+      
+      {/* Delete Category Dialog */}
+      {categoryToDelete && (
+        <DeleteCategoryDialog
+          categoryId={categoryToDelete.id}
+          categoryName={categoryToDelete.name}
+          open={deleteCategoryDialogOpen}
+          onOpenChange={setDeleteCategoryDialogOpen}
+        />
+      )}
     </>
   );
 }
@@ -79,6 +124,8 @@ interface SidebarContentProps {
   selectedCategoryId: string | null;
   onSelectCategory: (categoryId: string | null) => void;
   onAddCategory: () => void;
+  onEditCategory: (category: Category) => void;
+  onDeleteCategory: (categoryId: string) => void;
   viewMode: 'list' | 'calendar';
   setViewMode: (mode: 'list' | 'calendar') => void;
 }
@@ -88,6 +135,8 @@ function SidebarContent({
   selectedCategoryId,
   onSelectCategory,
   onAddCategory,
+  onEditCategory,
+  onDeleteCategory,
   viewMode,
   setViewMode,
 }: SidebarContentProps) {
@@ -95,7 +144,12 @@ function SidebarContent({
     <div className="flex h-full flex-col overflow-y-auto py-4">
       <div className="flex items-center justify-between px-4">
         <h2 className="text-lg font-semibold">Task Manager</h2>
-        <XIcon className="h-5 w-5 lg:hidden" onClick={() => document.querySelector('[data-radix-collection-item]')?.click()} />
+        <XIcon className="h-5 w-5 lg:hidden cursor-pointer" onClick={() => {
+          const closeButton = document.querySelector('[data-radix-collection-item]');
+          if (closeButton instanceof HTMLElement) {
+            closeButton.click();
+          }
+        }} />
       </div>
       
       <div className="mt-6 space-y-1 px-4">
@@ -154,21 +208,14 @@ function SidebarContent({
           {categories.length > 0 ? (
             <motion.div layout className="space-y-1">
               {categories.map((category) => (
-                <Button
+                <CategoryItem
                   key={category.id}
-                  variant="ghost"
-                  className={cn(
-                    'w-full justify-start',
-                    selectedCategoryId === category.id && 'bg-accent'
-                  )}
-                  onClick={() => onSelectCategory(category.id)}
-                >
-                  <div
-                    className="mr-2 h-3 w-3 rounded-full"
-                    style={{ backgroundColor: category.color }}
-                  />
-                  <span>{category.name}</span>
-                </Button>
+                  category={category}
+                  isSelected={selectedCategoryId === category.id}
+                  onSelect={onSelectCategory}
+                  onEdit={onEditCategory}
+                  onDelete={onDeleteCategory}
+                />
               ))}
             </motion.div>
           ) : (

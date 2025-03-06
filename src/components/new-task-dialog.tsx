@@ -1,6 +1,6 @@
 
 import { useAppStore } from '@/lib/store';
-import { Task } from '@/lib/types';
+import { Priority, Task } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -38,7 +38,7 @@ interface NewTaskDialogProps {
   initialTask?: Task | null;
 }
 
-const defaultTask = {
+const defaultTask: Omit<Task, 'id' | 'createdAt'> = {
   title: '',
   description: '',
   completed: false,
@@ -164,7 +164,7 @@ export function NewTaskDialog({
                 id="priority"
                 value={task.priority}
                 onValueChange={(value) =>
-                  setTask({ ...task, priority: value as 'low' | 'medium' | 'high' })
+                  setTask({ ...task, priority: value as Priority })
                 }
                 className="flex space-x-1"
               >

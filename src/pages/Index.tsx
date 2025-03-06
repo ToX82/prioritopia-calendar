@@ -1,6 +1,6 @@
 
 import { useAppStore } from '@/lib/store';
-import { Task } from '@/lib/types';
+import { Category, Task } from '@/lib/types';
 import { PageTransition } from '@/components/ui/page-transition';
 import { AppHeader } from '@/components/app-header';
 import { AppSidebar } from '@/components/app-sidebar';
@@ -10,6 +10,7 @@ import { NewTaskDialog } from '@/components/new-task-dialog';
 import { TaskDetail } from '@/components/task-detail';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { CategoryDialog } from '@/components/category-dialog';
 
 const Index = () => {
   const [newTaskDialogOpen, setNewTaskDialogOpen] = useState(false);
@@ -98,13 +99,6 @@ const Index = () => {
     setNewTaskDialogOpen(true);
   };
   
-  // Handle adding a new category
-  const handleAddCategory = () => {
-    // This would normally open a category dialog
-    // For simplicity, we'll just show a toast
-    toast('Category feature coming soon!');
-  };
-  
   // Reset selected date when switching view modes
   useEffect(() => {
     if (viewMode === 'list') {
@@ -142,7 +136,6 @@ const Index = () => {
           <AppSidebar
             selectedCategoryId={selectedCategory}
             onSelectCategory={setSelectedCategory}
-            onAddCategory={handleAddCategory}
           />
           
           <div className="flex flex-1 flex-col">
