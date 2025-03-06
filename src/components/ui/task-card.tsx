@@ -6,6 +6,7 @@ import { Task } from '@/lib/types';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CategoryBadge } from './category-badge';
 import { PriorityIndicator } from './priority-indicator';
+import { StatusBadge } from './status-badge';
 import { CalendarIcon } from 'lucide-react';
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -71,7 +72,10 @@ export function TaskCard({
       </div>
       
       <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
-        {category && <CategoryBadge category={category} />}
+        <div className="flex flex-wrap gap-2">
+          {category && <CategoryBadge category={category} />}
+          <StatusBadge status={task.status} showLabel={false} />
+        </div>
         
         {task.dueDate && (
           <div className="flex items-center gap-1 text-xs text-muted-foreground">

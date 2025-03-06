@@ -1,6 +1,7 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AppState, Category, Priority, Task, ViewMode } from './types';
+import { AppState, Category, Priority, Task, TaskStatus, ViewMode } from './types';
 
 const defaultCategories: Category[] = [
   { id: '1', name: 'Personal', color: '#3b82f6' },
@@ -46,6 +47,7 @@ export const useAppStore = create<
             ...task,
             id: crypto.randomUUID(),
             createdAt: new Date().toISOString(),
+            status: task.status || 'new', // Default to 'new' if not provided
           },
         ],
       })),
@@ -62,7 +64,13 @@ export const useAppStore = create<
       
       toggleTaskCompletion: (taskId) => set((state) => ({
         tasks: state.tasks.map((task) =>
-          task.id === taskId ? { ...task, completed: !task.completed } : task
+          task.id === taskId 
+            ? { 
+                ...task, 
+                completed: !task.completed,
+                status: !task.completed ? 'completed' : 'in-progress'
+              } 
+            : task
         ),
       })),
       
@@ -140,4 +148,24 @@ export const getPriorityColor = (priority: Priority) => {
     medium: 'bg-amber-100 text-amber-800',
     high: 'bg-rose-100 text-rose-800',
   }[priority];
+};
+
+export const getStatusLabel = (status: TaskStatus) => {
+  return {
+    'new': 'New',
+    'in-progress': 'In Progress',
+    'testing': 'Testing',
+    'awaiting-feedback': 'Awaiting Feedback',
+    'completed': 'Completed',
+  }[status];
+};
+
+export const getStatusColor = (status: TaskStatus) => {
+  return {
+    'new': 'bg-blue-100 text-blue-800',
+    'in-progress': 'bg-purple-100 text-purple-800',
+    'testing': 'bg-amber-100 text-amber-800',
+    'awaiting-feedback': 'bg-orange-100 text-orange-800',
+    'completed': 'bg-emerald-100 text-emerald-800',
+  }[status];
 };

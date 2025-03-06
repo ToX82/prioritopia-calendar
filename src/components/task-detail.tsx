@@ -4,6 +4,7 @@ import { formatDate } from '@/lib/date-utils';
 import { Button } from '@/components/ui/button';
 import { CategoryBadge } from '@/components/ui/category-badge';
 import { PriorityIndicator } from '@/components/ui/priority-indicator';
+import { StatusBadge } from '@/components/ui/status-badge';
 import {
   Sheet,
   SheetContent,
@@ -24,6 +25,9 @@ import {
 import { CalendarIcon, Pencil, Trash } from 'lucide-react';
 import React, { useState } from 'react';
 import { toast } from 'sonner';
+import { TaskStatus } from '@/lib/types';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getStatusLabel } from '@/lib/store';
 
 interface TaskDetailProps {
   taskId: string | null;
@@ -38,7 +42,7 @@ export function TaskDetail({
   onOpenChange,
   onEdit,
 }: TaskDetailProps) {
-  const { tasks, toggleTaskCompletion, deleteTask } = useAppStore();
+  const { tasks, toggleTaskCompletion, deleteTask, updateTask } = useAppStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   
   const task = tasks.find((t) => t.id === taskId);
@@ -55,6 +59,15 @@ export function TaskDetail({
     onOpenChange(false);
   };
   
+  const handleStatusChange = (value: string) => {
+    updateTask(task.id, { status: value as TaskStatus });
+    toast.success('Status updated', {
+      description: `Task status changed to ${getStatusLabel(value as TaskStatus)}`,
+    });
+  };
+  
+  const statuses: TaskStatus[] = ['new', 'in-progress', 'testing', 'awaiting-feedback', 'completed'];
+  
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -67,6 +80,26 @@ export function TaskDetail({
             <div className="flex flex-wrap gap-2">
               <PriorityIndicator priority={task.priority} />
               {category && <CategoryBadge category={category} />}
+              <StatusBadge status={task.status} />
+            </div>
+            
+            <div className="grid gap-2 pt-2">
+              <label className="text-sm font-medium">Status</label>
+              <Select
+                value={task.status}
+                onValueChange={handleStatusChange}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {statuses.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {getStatusLabel(status)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             {task.dueDate && (

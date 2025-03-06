@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { Priority, Task } from '@/lib/types';
+import { Priority, Task, TaskStatus } from '@/lib/types';
 import { useAppStore } from '@/lib/store';
 
 export function useTaskForm(initialTask: Task | null, onClose: () => void) {
@@ -12,6 +12,7 @@ export function useTaskForm(initialTask: Task | null, onClose: () => void) {
     dueDate: null,
     priority: 'medium',
     categoryId: null,
+    status: 'new',
   });
   const [date, setDate] = useState<Date | undefined>(undefined);
 
@@ -25,6 +26,7 @@ export function useTaskForm(initialTask: Task | null, onClose: () => void) {
         dueDate: initialTask.dueDate,
         priority: initialTask.priority,
         categoryId: initialTask.categoryId,
+        status: initialTask.status || 'new',
       });
       
       if (initialTask.dueDate) {
@@ -40,6 +42,7 @@ export function useTaskForm(initialTask: Task | null, onClose: () => void) {
         dueDate: null,
         priority: 'medium',
         categoryId: null,
+        status: 'new',
       });
       setDate(undefined);
     }

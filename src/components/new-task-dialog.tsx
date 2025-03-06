@@ -13,6 +13,7 @@ import { useTaskForm } from '@/hooks/use-task-form';
 import { BasicInfoFields } from './task-form/basic-info-fields';
 import { CategoryField } from './task-form/category-field';
 import { PriorityField } from './task-form/priority-field';
+import { StatusField } from './task-form/status-field';
 import { DueDateField } from './task-form/due-date-field';
 import { CompletedField } from './task-form/completed-field';
 
@@ -64,6 +65,11 @@ export function NewTaskDialog({
             <PriorityField
               priority={task.priority}
               onPriorityChange={(value) => updateTaskField('priority', value)}
+            />
+            
+            <StatusField
+              status={task.status}
+              onStatusChange={(value) => updateTaskField('status', value)}
             />
             
             <DueDateField
