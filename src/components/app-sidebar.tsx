@@ -8,7 +8,15 @@ import {
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { PlusIcon, ListIcon, CalendarIcon, MenuIcon, LayoutGridIcon, XIcon, LayoutKanbanIcon } from 'lucide-react';
+import {
+  PlusIcon, 
+  ListIcon, 
+  CalendarIcon, 
+  MenuIcon, 
+  LayoutGridIcon, 
+  XIcon, 
+  KanbanIcon
+} from 'lucide-react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CategoryItem } from './category-item';
@@ -201,7 +209,7 @@ function SidebarContent({
           )}
           onClick={() => setViewMode('kanban')}
         >
-          <LayoutKanbanIcon className="mr-2 h-4 w-4" />
+          <KanbanIcon className="mr-2 h-4 w-4" />
           <span>Kanban View</span>
         </Button>
       </div>

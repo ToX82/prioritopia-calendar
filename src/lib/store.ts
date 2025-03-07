@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AppState, Category, Priority, Task, TaskStatus, TaskStatusConfig, ViewMode } from './types';
@@ -49,7 +48,7 @@ type AppStore = AppState & {
   setSelectedDate: (date: string | null) => void;
 };
 
-export const useAppStore = create<AppStore>(
+export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
       ...initialState,
@@ -117,7 +116,7 @@ export const useAppStore = create<AppStore>(
           tasks: updatedTasks,
         };
       }),
-
+      
       // Status actions
       addStatus: (status) => set((state) => {
         const newStatusId = crypto.randomUUID();
