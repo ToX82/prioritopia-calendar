@@ -100,7 +100,7 @@ export function KanbanView({
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                   draggable
-                  onDragStart={(e) => {
+                  onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
                     e.dataTransfer.setData('taskId', task.id);
                   }}
                 >

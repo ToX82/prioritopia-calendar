@@ -1,14 +1,14 @@
 
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
-import { Category } from '@/lib/types';
+import { Category, ViewMode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
   SheetContent,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { PlusIcon, ListIcon, CalendarIcon, MenuIcon, LayoutGridIcon, XIcon } from 'lucide-react';
+import { PlusIcon, ListIcon, CalendarIcon, MenuIcon, LayoutGridIcon, XIcon, LayoutKanbanIcon } from 'lucide-react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CategoryItem } from './category-item';
@@ -18,11 +18,19 @@ import { DeleteCategoryDialog } from './delete-category-dialog';
 interface AppSidebarProps {
   selectedCategoryId: string | null;
   onSelectCategory: (categoryId: string | null) => void;
+  onManageCategories: () => void;
+  onManageStatuses: () => void;
+  viewMode: ViewMode;
+  onChangeViewMode: (mode: ViewMode) => void;
 }
 
 export function AppSidebar({
   onSelectCategory,
   selectedCategoryId,
+  onManageCategories,
+  onManageStatuses,
+  viewMode,
+  onChangeViewMode
 }: AppSidebarProps) {
   const [open, setOpen] = useState(false);
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
@@ -30,7 +38,7 @@ export function AppSidebar({
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<{ id: string, name: string } | null>(null);
   
-  const { categories, viewMode, setViewMode } = useAppStore();
+  const { categories } = useAppStore();
   
   const handleAddCategory = () => {
     setEditingCategory(null);
@@ -74,9 +82,11 @@ export function AppSidebar({
             onAddCategory={handleAddCategory}
             onEditCategory={handleEditCategory}
             onDeleteCategory={handleDeleteCategory}
+            onManageCategories={onManageCategories}
+            onManageStatuses={onManageStatuses}
             viewMode={viewMode}
             setViewMode={(mode) => {
-              setViewMode(mode);
+              onChangeViewMode(mode);
               setOpen(false);
             }}
           />
@@ -93,8 +103,10 @@ export function AppSidebar({
             onAddCategory={handleAddCategory}
             onEditCategory={handleEditCategory}
             onDeleteCategory={handleDeleteCategory}
+            onManageCategories={onManageCategories}
+            onManageStatuses={onManageStatuses}
             viewMode={viewMode}
-            setViewMode={setViewMode}
+            setViewMode={onChangeViewMode}
           />
         </div>
       </aside>
@@ -126,8 +138,10 @@ interface SidebarContentProps {
   onAddCategory: () => void;
   onEditCategory: (category: Category) => void;
   onDeleteCategory: (categoryId: string) => void;
-  viewMode: 'list' | 'calendar';
-  setViewMode: (mode: 'list' | 'calendar') => void;
+  onManageCategories: () => void;
+  onManageStatuses: () => void;
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
 }
 
 function SidebarContent({
@@ -137,6 +151,8 @@ function SidebarContent({
   onAddCategory,
   onEditCategory,
   onDeleteCategory,
+  onManageCategories,
+  onManageStatuses,
   viewMode,
   setViewMode,
 }: SidebarContentProps) {
@@ -175,6 +191,18 @@ function SidebarContent({
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
           <span>Calendar View</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            viewMode === 'kanban' && 'bg-accent'
+          )}
+          onClick={() => setViewMode('kanban')}
+        >
+          <LayoutKanbanIcon className="mr-2 h-4 w-4" />
+          <span>Kanban View</span>
         </Button>
       </div>
       
@@ -223,6 +251,25 @@ function SidebarContent({
               No categories yet
             </div>
           )}
+        </div>
+      </div>
+
+      <div className="mt-auto px-4 pb-4">
+        <div className="space-y-1">
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={onManageCategories}
+          >
+            <span>Manage Categories</span>
+          </Button>
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+            onClick={onManageStatuses}
+          >
+            <span>Manage Statuses</span>
+          </Button>
         </div>
       </div>
     </div>

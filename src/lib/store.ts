@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AppState, Category, Priority, Task, TaskStatus, TaskStatusConfig, ViewMode } from './types';
@@ -164,7 +163,6 @@ export const useAppStore = create<
   )
 );
 
-// Utility functions
 export const getTasksByDate = (date: string | null) => {
   const state = useAppStore.getState();
   if (!date) return state.tasks;
