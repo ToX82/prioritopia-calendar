@@ -1,7 +1,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { AppState, Category, Priority, Task, TaskStatus, ViewMode } from './types';
+import { AppState, Category, Priority, Task, TaskStatus, TaskStatusConfig, ViewMode } from './types';
 
 const defaultCategories: Category[] = [
   { id: '1', name: 'Personal', color: '#3b82f6' },
@@ -10,9 +10,18 @@ const defaultCategories: Category[] = [
   { id: '4', name: 'Health', color: '#ef4444' },
 ];
 
+const defaultStatuses: TaskStatusConfig[] = [
+  { id: 'new', name: 'New', color: '#3b82f6', order: 0 },
+  { id: 'in-progress', name: 'In Progress', color: '#8b5cf6', order: 1 },
+  { id: 'testing', name: 'Testing', color: '#f59e0b', order: 2 },
+  { id: 'awaiting-feedback', name: 'Awaiting Feedback', color: '#f97316', order: 3 },
+  { id: 'completed', name: 'Completed', color: '#10b981', order: 4 },
+];
+
 const initialState: AppState = {
   tasks: [],
   categories: defaultCategories,
+  statuses: defaultStatuses,
   viewMode: 'list',
   selectedDate: null,
 };
@@ -29,6 +38,11 @@ export const useAppStore = create<
     addCategory: (category: Omit<Category, 'id'>) => void;
     updateCategory: (categoryId: string, updates: Partial<Category>) => void;
     deleteCategory: (categoryId: string) => void;
+    
+    // Status actions
+    addStatus: (status: Omit<TaskStatusConfig, 'id'>) => void;
+    updateStatus: (statusId: string, updates: Partial<TaskStatusConfig>) => void;
+    deleteStatus: (statusId: string) => void;
     
     // View actions
     setViewMode: (mode: ViewMode) => void;
@@ -102,6 +116,43 @@ export const useAppStore = create<
           tasks: updatedTasks,
         };
       }),
+
+      // Status actions
+      addStatus: (status) => set((state) => {
+        const newStatusId = crypto.randomUUID();
+        return {
+          statuses: [
+            ...state.statuses,
+            {
+              ...status,
+              id: newStatusId,
+            },
+          ],
+        };
+      }),
+      
+      updateStatus: (statusId, updates) => set((state) => ({
+        statuses: state.statuses.map((status) =>
+          status.id === statusId ? { ...status, ...updates } : status
+        ),
+      })),
+      
+      deleteStatus: (statusId) => set((state) => {
+        // We can't delete default statuses
+        if (['new', 'in-progress', 'testing', 'awaiting-feedback', 'completed'].includes(statusId)) {
+          return state;
+        }
+        
+        // Update tasks with this status to have 'new' status
+        const updatedTasks = state.tasks.map((task) =>
+          task.statusId === statusId ? { ...task, statusId: undefined, status: 'new' } : task
+        );
+        
+        return {
+          statuses: state.statuses.filter((status) => status.id !== statusId),
+          tasks: updatedTasks,
+        };
+      }),
       
       // View actions
       setViewMode: (mode) => set({ viewMode: mode }),
@@ -113,6 +164,7 @@ export const useAppStore = create<
   )
 );
 
+// Utility functions
 export const getTasksByDate = (date: string | null) => {
   const state = useAppStore.getState();
   if (!date) return state.tasks;
@@ -134,6 +186,17 @@ export const getCategory = (categoryId: string | null) => {
   return state.categories.find((category) => category.id === categoryId) || null;
 };
 
+export const getStatus = (statusId: string | null) => {
+  if (!statusId) return null;
+  const state = useAppStore.getState();
+  return state.statuses.find((status) => status.id === statusId) || null;
+};
+
+export const getStatusByCode = (statusCode: TaskStatus): TaskStatusConfig | null => {
+  const state = useAppStore.getState();
+  return state.statuses.find((status) => status.id === statusCode) || null;
+};
+
 export const getPriorityLabel = (priority: Priority) => {
   return {
     low: 'Low',
@@ -151,7 +214,8 @@ export const getPriorityColor = (priority: Priority) => {
 };
 
 export const getStatusLabel = (status: TaskStatus) => {
-  return {
+  const statusConfig = getStatusByCode(status);
+  return statusConfig ? statusConfig.name : {
     'new': 'New',
     'in-progress': 'In Progress',
     'testing': 'Testing',
@@ -161,6 +225,11 @@ export const getStatusLabel = (status: TaskStatus) => {
 };
 
 export const getStatusColor = (status: TaskStatus) => {
+  const statusConfig = getStatusByCode(status);
+  if (statusConfig) {
+    return `bg-opacity-15 text-opacity-90 bg-${statusConfig.color} text-${statusConfig.color}`;
+  }
+  
   return {
     'new': 'bg-blue-100 text-blue-800',
     'in-progress': 'bg-purple-100 text-purple-800',
@@ -168,4 +237,9 @@ export const getStatusColor = (status: TaskStatus) => {
     'awaiting-feedback': 'bg-orange-100 text-orange-800',
     'completed': 'bg-emerald-100 text-emerald-800',
   }[status];
+};
+
+export const getOrderedStatuses = () => {
+  const state = useAppStore.getState();
+  return [...state.statuses].sort((a, b) => a.order - b.order);
 };

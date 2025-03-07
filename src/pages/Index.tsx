@@ -6,11 +6,13 @@ import { AppHeader } from '@/components/app-header';
 import { AppSidebar } from '@/components/app-sidebar';
 import { CalendarView } from '@/components/calendar-view';
 import { ListView } from '@/components/list-view';
+import { KanbanView } from '@/components/kanban-view';
 import { NewTaskDialog } from '@/components/new-task-dialog';
 import { TaskDetail } from '@/components/task-detail';
 import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { CategoryDialog } from '@/components/category-dialog';
+import { StatusManagementDialog } from '@/components/status-management-dialog';
 
 const Index = () => {
   const [newTaskDialogOpen, setNewTaskDialogOpen] = useState(false);
@@ -19,6 +21,8 @@ const Index = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusManagementOpen, setStatusManagementOpen] = useState(false);
+  const [categoryManagementOpen, setCategoryManagementOpen] = useState(false);
   
   const {
     tasks,
@@ -27,6 +31,7 @@ const Index = () => {
     toggleTaskCompletion,
     selectedDate,
     setSelectedDate,
+    setViewMode,
   } = useAppStore();
   
   // Filter tasks by selected category and search query
@@ -98,6 +103,16 @@ const Index = () => {
     setEditingTask(null);
     setNewTaskDialogOpen(true);
   };
+
+  // Handle opening status management
+  const handleManageStatuses = () => {
+    setStatusManagementOpen(true);
+  };
+
+  // Handle opening category management
+  const handleManageCategories = () => {
+    setCategoryManagementOpen(true);
+  };
   
   // Reset selected date when switching view modes
   useEffect(() => {
@@ -108,25 +123,35 @@ const Index = () => {
   
   // Decide which view to render
   const renderView = (): ReactNode => {
-    if (viewMode === 'calendar') {
-      return (
-        <CalendarView
-          tasks={filteredTasks}
-          onTaskClick={handleTaskClick}
-          onToggleComplete={handleToggleTaskCompletion}
-          onAddTask={handleAddTask}
-        />
-      );
+    switch (viewMode) {
+      case 'calendar':
+        return (
+          <CalendarView
+            tasks={filteredTasks}
+            onTaskClick={handleTaskClick}
+            onToggleComplete={handleToggleTaskCompletion}
+            onAddTask={handleAddTask}
+          />
+        );
+      case 'kanban':
+        return (
+          <KanbanView
+            tasks={filteredTasks}
+            onTaskClick={handleTaskClick}
+            onToggleComplete={handleToggleTaskCompletion}
+            onAddTask={handleAddTask}
+          />
+        );
+      default:
+        return (
+          <ListView
+            tasks={filteredTasks}
+            onTaskClick={handleTaskClick}
+            onToggleComplete={handleToggleTaskCompletion}
+            onAddTask={handleAddTask}
+          />
+        );
     }
-    
-    return (
-      <ListView
-        tasks={filteredTasks}
-        onTaskClick={handleTaskClick}
-        onToggleComplete={handleToggleTaskCompletion}
-        onAddTask={handleAddTask}
-      />
-    );
   };
   
   return (
@@ -136,6 +161,10 @@ const Index = () => {
           <AppSidebar
             selectedCategoryId={selectedCategory}
             onSelectCategory={setSelectedCategory}
+            onManageCategories={handleManageCategories}
+            onManageStatuses={handleManageStatuses}
+            viewMode={viewMode}
+            onChangeViewMode={setViewMode}
           />
           
           <div className="flex flex-1 flex-col">
@@ -162,6 +191,16 @@ const Index = () => {
           open={taskDetailOpen}
           onOpenChange={setTaskDetailOpen}
           onEdit={handleEditTask}
+        />
+
+        <CategoryDialog
+          open={categoryManagementOpen}
+          onOpenChange={setCategoryManagementOpen}
+        />
+
+        <StatusManagementDialog
+          open={statusManagementOpen}
+          onOpenChange={setStatusManagementOpen}
         />
       </div>
     </PageTransition>

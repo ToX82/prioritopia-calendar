@@ -42,7 +42,7 @@ export function TaskDetail({
   onOpenChange,
   onEdit,
 }: TaskDetailProps) {
-  const { tasks, toggleTaskCompletion, deleteTask, updateTask } = useAppStore();
+  const { tasks, toggleTaskCompletion, deleteTask, updateTask, statuses } = useAppStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   
   const task = tasks.find((t) => t.id === taskId);
@@ -65,8 +65,6 @@ export function TaskDetail({
       description: `Task status changed to ${getStatusLabel(value as TaskStatus)}`,
     });
   };
-  
-  const statuses: TaskStatus[] = ['new', 'in-progress', 'testing', 'awaiting-feedback', 'completed'];
   
   return (
     <>
@@ -93,10 +91,18 @@ export function TaskDetail({
                   <SelectValue placeholder="Select a status" />
                 </SelectTrigger>
                 <SelectContent>
-                  {statuses.map((status) => (
-                    <SelectItem key={status} value={status}>
-                      {getStatusLabel(status)}
-                    </SelectItem>
+                  {statuses
+                    .sort((a, b) => a.order - b.order)
+                    .map((status) => (
+                      <SelectItem key={status.id} value={status.id}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-2 w-2 rounded-full"
+                            style={{ backgroundColor: status.color }}
+                          />
+                          <span>{status.name}</span>
+                        </div>
+                      </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
