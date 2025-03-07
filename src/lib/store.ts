@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AppState, Category, Priority, Task, TaskStatus, TaskStatusConfig, ViewMode } from './types';
@@ -25,29 +26,30 @@ const initialState: AppState = {
   selectedDate: null,
 };
 
-export const useAppStore = create<
-  AppState & {
-    // Task actions
-    addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void;
-    updateTask: (taskId: string, updates: Partial<Task>) => void;
-    deleteTask: (taskId: string) => void;
-    toggleTaskCompletion: (taskId: string) => void;
-    
-    // Category actions
-    addCategory: (category: Omit<Category, 'id'>) => void;
-    updateCategory: (categoryId: string, updates: Partial<Category>) => void;
-    deleteCategory: (categoryId: string) => void;
-    
-    // Status actions
-    addStatus: (status: Omit<TaskStatusConfig, 'id'>) => void;
-    updateStatus: (statusId: string, updates: Partial<TaskStatusConfig>) => void;
-    deleteStatus: (statusId: string) => void;
-    
-    // View actions
-    setViewMode: (mode: ViewMode) => void;
-    setSelectedDate: (date: string | null) => void;
-  }
->(
+// Define the store type
+type AppStore = AppState & {
+  // Task actions
+  addTask: (task: Omit<Task, 'id' | 'createdAt'>) => void;
+  updateTask: (taskId: string, updates: Partial<Task>) => void;
+  deleteTask: (taskId: string) => void;
+  toggleTaskCompletion: (taskId: string) => void;
+  
+  // Category actions
+  addCategory: (category: Omit<Category, 'id'>) => void;
+  updateCategory: (categoryId: string, updates: Partial<Category>) => void;
+  deleteCategory: (categoryId: string) => void;
+  
+  // Status actions
+  addStatus: (status: Omit<TaskStatusConfig, 'id'>) => void;
+  updateStatus: (statusId: string, updates: Partial<TaskStatusConfig>) => void;
+  deleteStatus: (statusId: string) => void;
+  
+  // View actions
+  setViewMode: (mode: ViewMode) => void;
+  setSelectedDate: (date: string | null) => void;
+};
+
+export const useAppStore = create<AppStore>(
   persist(
     (set) => ({
       ...initialState,
@@ -143,9 +145,12 @@ export const useAppStore = create<
         }
         
         // Update tasks with this status to have 'new' status
-        const updatedTasks = state.tasks.map((task) =>
-          task.statusId === statusId ? { ...task, statusId: undefined, status: 'new' } : task
-        );
+        const updatedTasks = state.tasks.map((task) => {
+          if (task.status === statusId) {
+            return { ...task, status: 'new' as TaskStatus };
+          }
+          return task;
+        });
         
         return {
           statuses: state.statuses.filter((status) => status.id !== statusId),

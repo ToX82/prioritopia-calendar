@@ -92,13 +92,8 @@ export function KanbanView({
             
             <div className="flex-1 p-2 space-y-2 min-h-[200px]">
               {tasksByStatus[status.id].map((task) => (
-                <motion.div
+                <div
                   key={task.id}
-                  layoutId={task.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
                   draggable
                   onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
                     e.dataTransfer.setData('taskId', task.id);
@@ -110,7 +105,7 @@ export function KanbanView({
                     onToggleComplete={onToggleComplete}
                     className="bg-background"
                   />
-                </motion.div>
+                </div>
               ))}
             </div>
             

@@ -3,7 +3,7 @@ import { useAppStore } from '@/lib/store';
 import { ViewMode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CalendarIcon, ListIcon, PlusIcon, Search, LayoutKanbanIcon } from 'lucide-react';
+import { CalendarIcon, ListIcon, PlusIcon, Search, LayoutKanban } from 'lucide-react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -58,7 +58,7 @@ export function AppHeader({ onAddTask, onSearch }: AppHeaderProps) {
             className={viewMode === 'kanban' ? 'bg-secondary' : ''}
             onClick={() => setViewMode('kanban')}
           >
-            <LayoutKanbanIcon className="h-4 w-4" />
+            <LayoutKanban className="h-4 w-4" />
             <span className="sr-only">Kanban View</span>
           </Button>
           
