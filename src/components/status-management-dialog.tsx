@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
 import { TaskStatusConfig } from '@/lib/types';
 import { Button } from '@/components/ui/button';
@@ -44,6 +44,15 @@ export function StatusManagementDialog({
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusToDelete, setStatusToDelete] = useState<string | null>(null);
+  const [formKey, setFormKey] = useState(Date.now()); // Used to force re-render
+
+  // Reset the form when the dialog opens
+  useEffect(() => {
+    if (open) {
+      resetForm();
+      setFormKey(Date.now());
+    }
+  }, [open]);
 
   // Get next available order
   const getNextOrder = () => {
@@ -108,105 +117,113 @@ export function StatusManagementDialog({
     setStatusToDelete(null);
   };
 
+  const handleClose = () => {
+    onOpenChange(false);
+  };
+
   const isDefaultStatus = (statusId: string) => {
     return ['new', 'in-progress', 'testing', 'awaiting-feedback', 'completed'].includes(statusId);
   };
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[500px]">
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-[500px] bg-background">
           <DialogHeader>
-            <DialogTitle>Manage Task Statuses</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl">Manage Task Statuses</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
               Add, edit, or remove task statuses. Default statuses cannot be deleted.
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 py-4" key={formKey}>
             <div className="space-y-4">
               <div className="grid grid-cols-[1fr,120px,auto] gap-2 items-center">
-                <Label>Name</Label>
-                <Label>Color</Label>
+                <Label className="text-foreground/80">Name</Label>
+                <Label className="text-foreground/80">Color</Label>
                 <span></span>
               </div>
 
-              {statuses
-                .sort((a, b) => a.order - b.order)
-                .map((status) => (
-                  <div key={status.id} className="grid grid-cols-[1fr,120px,auto] gap-2 items-center">
-                    <div className="flex items-center gap-2">
+              <div className="max-h-[200px] overflow-y-auto pr-2 space-y-2">
+                {statuses
+                  .sort((a, b) => a.order - b.order)
+                  .map((status) => (
+                    <div key={status.id} className="grid grid-cols-[1fr,120px,auto] gap-2 items-center bg-muted/30 p-2 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className="h-3 w-3 rounded-full"
+                          style={{ backgroundColor: status.color }}
+                        />
+                        <span>{status.name}</span>
+                        {isDefaultStatus(status.id) && (
+                          <span className="text-xs text-muted-foreground ml-1">(Default)</span>
+                        )}
+                      </div>
                       <div
-                        className="h-3 w-3 rounded-full"
+                        className="w-full h-8 rounded-md border border-input cursor-pointer"
                         style={{ backgroundColor: status.color }}
-                      />
-                      <span>{status.name}</span>
-                      {isDefaultStatus(status.id) && (
-                        <span className="text-xs text-muted-foreground">(Default)</span>
-                      )}
-                    </div>
-                    <div
-                      className="w-full h-8 rounded-md border border-input cursor-pointer"
-                      style={{ backgroundColor: status.color }}
-                      onClick={() => handleEditStatus(status)}
-                    />
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
                         onClick={() => handleEditStatus(status)}
-                        disabled={isDefaultStatus(status.id)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDeleteStatus(status.id)}
-                        disabled={isDefaultStatus(status.id)}
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      />
+                      <div className="flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditStatus(status)}
+                          disabled={isDefaultStatus(status.id)}
+                          className="h-8 w-8"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDeleteStatus(status.id)}
+                          disabled={isDefaultStatus(status.id)}
+                          className="text-destructive hover:text-destructive h-8 w-8"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+              </div>
             </div>
 
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-sm font-medium mb-3">
+              <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
                 {editingStatus ? 'Edit Status' : 'Add New Status'}
+                {editingStatus && <span className="text-xs bg-muted px-2 py-0.5 rounded-full">Editing: {editingStatus.name}</span>}
               </h3>
               <div className="grid gap-4">
                 <div className="grid grid-cols-[1fr,120px] gap-2">
                   <div className="space-y-2">
-                    <Label htmlFor="statusName">Name</Label>
+                    <Label htmlFor="statusName" className="text-foreground/80">Name</Label>
                     <Input
                       id="statusName"
                       value={newStatus.name}
                       onChange={(e) => setNewStatus({ ...newStatus, name: e.target.value })}
                       placeholder="Enter status name"
-                      className="w-full"
+                      className="w-full bg-background border-input focus-visible:ring-primary/30"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="statusColor">Color</Label>
+                    <Label htmlFor="statusColor" className="text-foreground/80">Color</Label>
                     <Input
                       id="statusColor"
                       type="color"
                       value={newStatus.color}
                       onChange={(e) => setNewStatus({ ...newStatus, color: e.target.value })}
-                      className="w-full h-10 p-1"
+                      className="w-full h-10 p-1 cursor-pointer"
                     />
                   </div>
                 </div>
                 <div className="flex justify-end gap-2">
                   {editingStatus && (
-                    <Button variant="outline" onClick={resetForm}>
+                    <Button variant="outline" onClick={resetForm} className="border-input">
                       Cancel
                     </Button>
                   )}
-                  <Button onClick={handleAddStatus}>
+                  <Button onClick={handleAddStatus} className="bg-primary hover:bg-primary/90">
                     {editingStatus ? 'Update' : 'Add'} Status
                   </Button>
                 </div>
@@ -217,7 +234,7 @@ export function StatusManagementDialog({
       </Dialog>
 
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-background">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Status</AlertDialogTitle>
             <AlertDialogDescription>

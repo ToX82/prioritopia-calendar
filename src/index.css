@@ -87,15 +87,50 @@
   
   /* Priority indicators */
   .priority-low {
-    @apply bg-emerald-100 text-emerald-800;
+    @apply bg-emerald-100 text-emerald-800 font-medium;
   }
   
   .priority-medium {
-    @apply bg-amber-100 text-amber-800;
+    @apply bg-amber-100 text-amber-800 font-medium;
   }
   
   .priority-high {
-    @apply bg-rose-100 text-rose-800;
+    @apply bg-rose-100 text-rose-800 font-medium;
+  }
+
+  /* Dialog fixes */
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+  }
+
+  /* Input focus styles */
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    @apply ring-1 ring-primary/40 border-primary/60;
+    outline: none;
+  }
+
+  /* Button hover animations */
+  button {
+    @apply transition-all duration-150;
+  }
+
+  /* Dialog backdrop fixes */
+  [data-state="open"] > .dialog-backdrop {
+    animation: fadeIn 200ms ease;
+  }
+
+  [data-state="closed"] > .dialog-backdrop {
+    animation: fadeOut 200ms ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 }
 

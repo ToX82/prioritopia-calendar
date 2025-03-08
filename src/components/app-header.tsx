@@ -4,7 +4,7 @@ import { ViewMode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { CalendarIcon, ListIcon, PlusIcon, Search, KanbanIcon } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 interface AppHeaderProps {
@@ -21,50 +21,58 @@ export function AppHeader({ onAddTask, onSearch }: AppHeaderProps) {
     setSearchQuery(value);
     onSearch(value);
   };
+
+  // Save the viewMode to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('lastViewMode', viewMode);
+  }, [viewMode]);
   
   return (
     <motion.header 
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="sticky top-0 z-10 flex flex-col gap-4 border-b bg-background/80 px-4 py-4 backdrop-blur-md sm:px-6"
+      className="sticky top-0 z-10 flex flex-col gap-4 border-b bg-background/95 px-4 py-4 backdrop-blur-md sm:px-6 shadow-sm"
     >
       <div className="flex items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold sm:text-2xl">Task Manager</h1>
+        <h1 className="text-xl font-semibold sm:text-2xl bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Task Manager</h1>
         
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            className={viewMode === 'list' ? 'bg-secondary' : ''}
-            onClick={() => setViewMode('list')}
-          >
-            <ListIcon className="h-4 w-4" />
-            <span className="sr-only">List View</span>
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="icon"
-            className={viewMode === 'calendar' ? 'bg-secondary' : ''}
-            onClick={() => setViewMode('calendar')}
-          >
-            <CalendarIcon className="h-4 w-4" />
-            <span className="sr-only">Calendar View</span>
-          </Button>
+          <div className="bg-muted/50 rounded-lg p-1 flex items-center gap-1">
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'ghost'}
+              size="icon"
+              className="rounded-md h-8 w-8"
+              onClick={() => setViewMode('list')}
+            >
+              <ListIcon className="h-4 w-4" />
+              <span className="sr-only">List View</span>
+            </Button>
+            
+            <Button
+              variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+              size="icon"
+              className="rounded-md h-8 w-8"
+              onClick={() => setViewMode('calendar')}
+            >
+              <CalendarIcon className="h-4 w-4" />
+              <span className="sr-only">Calendar View</span>
+            </Button>
 
-          <Button
-            variant="outline"
-            size="icon"
-            className={viewMode === 'kanban' ? 'bg-secondary' : ''}
-            onClick={() => setViewMode('kanban')}
-          >
-            <KanbanIcon className="h-4 w-4" />
-            <span className="sr-only">Kanban View</span>
-          </Button>
+            <Button
+              variant={viewMode === 'kanban' ? 'default' : 'ghost'}
+              size="icon"
+              className="rounded-md h-8 w-8"
+              onClick={() => setViewMode('kanban')}
+            >
+              <KanbanIcon className="h-4 w-4" />
+              <span className="sr-only">Kanban View</span>
+            </Button>
+          </div>
           
-          <Button onClick={onAddTask} size="sm">
+          <Button onClick={onAddTask} size="sm" className="bg-primary hover:bg-primary/90 text-white shadow-sm">
             <PlusIcon className="mr-1 h-4 w-4" />
-            <span>Add Task</span>
+            <span className="hidden sm:inline">Add Task</span>
+            <span className="sm:hidden">Add</span>
           </Button>
         </div>
       </div>
@@ -75,7 +83,7 @@ export function AppHeader({ onAddTask, onSearch }: AppHeaderProps) {
           <Input
             type="text"
             placeholder="Search tasks..."
-            className="pl-9"
+            className="pl-9 border-muted bg-background/50 focus-visible:ring-primary/30 w-full"
             value={searchQuery}
             onChange={handleSearchChange}
           />

@@ -46,7 +46,7 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
               value={task.title}
               onChange={(e) => updateTaskField('title', e.target.value)}
               placeholder="Task title"
-              className="text-lg font-medium border-none p-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground"
+              className="text-lg font-medium border-input bg-background p-2 h-auto focus-visible:ring-primary/30 placeholder:text-muted-foreground"
               autoFocus
               required
             />
@@ -55,13 +55,13 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
               value={task.description}
               onChange={(e) => updateTaskField('description', e.target.value)}
               placeholder="Task description (optional)"
-              className="resize-none min-h-24 border-none focus-visible:ring-0 p-0 placeholder:text-muted-foreground"
+              className="resize-none min-h-24 border-input bg-background p-2 focus-visible:ring-primary/30 placeholder:text-muted-foreground"
             />
           </div>
         </div>
 
         <Tabs defaultValue="details" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 bg-muted/50">
             <TabsTrigger value="details" className="text-sm">Details</TabsTrigger>
             <TabsTrigger value="dates" className="text-sm">Due Date</TabsTrigger>
           </TabsList>
@@ -70,14 +70,14 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
             <div className="grid grid-cols-2 gap-4">
               {/* Status */}
               <div>
-                <Label htmlFor="status" className="text-xs flex items-center gap-1 text-muted-foreground mb-1">
+                <Label htmlFor="status" className="text-xs flex items-center gap-1 text-foreground/80 mb-1">
                   <Clock className="h-3 w-3" /> Status
                 </Label>
                 <Select
                   value={task.status}
                   onValueChange={(value) => updateTaskField('status', value as TaskStatus)}
                 >
-                  <SelectTrigger id="status" className="w-full">
+                  <SelectTrigger id="status" className="w-full bg-background border-input focus:ring-primary/30">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -100,14 +100,14 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
 
               {/* Priority */}
               <div>
-                <Label htmlFor="priority" className="text-xs flex items-center gap-1 text-muted-foreground mb-1">
+                <Label htmlFor="priority" className="text-xs flex items-center gap-1 text-foreground/80 mb-1">
                   <Flag className="h-3 w-3" /> Priority
                 </Label>
                 <Select
                   value={task.priority}
                   onValueChange={(value) => updateTaskField('priority', value as any)}
                 >
-                  <SelectTrigger id="priority" className="w-full">
+                  <SelectTrigger id="priority" className="w-full bg-background border-input focus:ring-primary/30">
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>
                   <SelectContent>
@@ -121,14 +121,14 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
 
             {/* Category */}
             <div>
-              <Label htmlFor="category" className="text-xs flex items-center gap-1 text-muted-foreground mb-1">
+              <Label htmlFor="category" className="text-xs flex items-center gap-1 text-foreground/80 mb-1">
                 <Folder className="h-3 w-3" /> Category
               </Label>
               <Select
                 value={task.categoryId || 'none'}
                 onValueChange={(value) => updateTaskField('categoryId', value === 'none' ? null : value)}
               >
-                <SelectTrigger id="category" className="w-full">
+                <SelectTrigger id="category" className="w-full bg-background border-input focus:ring-primary/30">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -152,14 +152,17 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
             <div className="flex items-center space-x-2 pt-2">
               <div 
                 className={cn(
-                  "h-5 w-5 rounded-sm border border-input flex items-center justify-center cursor-pointer",
-                  task.completed && "bg-primary border-primary"
+                  "h-5 w-5 rounded-sm border border-input flex items-center justify-center cursor-pointer transition-colors",
+                  task.completed ? "bg-primary border-primary" : "hover:bg-muted/50"
                 )}
                 onClick={() => updateTaskField('completed', !task.completed)}
               >
                 {task.completed && <Check className="h-3 w-3 text-primary-foreground" />}
               </div>
-              <Label className="cursor-pointer" onClick={() => updateTaskField('completed', !task.completed)}>
+              <Label 
+                className="cursor-pointer text-sm" 
+                onClick={() => updateTaskField('completed', !task.completed)}
+              >
                 Mark as completed
               </Label>
             </div>
@@ -167,7 +170,7 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
           
           <TabsContent value="dates" className="py-4">
             <div className="space-y-4">
-              <Label htmlFor="dueDate" className="text-xs flex items-center gap-1 text-muted-foreground">
+              <Label htmlFor="dueDate" className="text-xs flex items-center gap-1 text-foreground/80">
                 <CalendarIcon className="h-3 w-3" /> Due Date
               </Label>
               <Popover>
@@ -175,7 +178,7 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal border-input bg-background",
                       !date && "text-muted-foreground"
                     )}
                   >
@@ -189,8 +192,20 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
                     selected={date}
                     onSelect={updateDate}
                     initialFocus
-                    className="p-3"
+                    className="p-3 border rounded-md"
                   />
+                  {date && (
+                    <div className="p-3 border-t flex justify-end">
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        onClick={() => updateDate(null)}
+                        className="text-sm"
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                  )}
                 </PopoverContent>
               </Popover>
             </div>
@@ -198,7 +213,7 @@ export function TaskForm({ initialTask, onSubmit }: TaskFormProps) {
         </Tabs>
       </div>
       
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
         {isEditing ? 'Update Task' : 'Create Task'}
       </Button>
     </form>

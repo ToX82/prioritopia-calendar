@@ -23,7 +23,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { CalendarIcon, Pencil, Trash } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { TaskStatus } from '@/lib/types';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -44,8 +44,18 @@ export function TaskDetail({
 }: TaskDetailProps) {
   const { tasks, toggleTaskCompletion, deleteTask, updateTask, statuses } = useAppStore();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [task, setTask] = useState<any>(null);
   
-  const task = tasks.find((t) => t.id === taskId);
+  // Update task when taskId changes
+  useEffect(() => {
+    if (taskId) {
+      const foundTask = tasks.find((t) => t.id === taskId);
+      setTask(foundTask || null);
+    } else {
+      setTask(null);
+    }
+  }, [taskId, tasks]);
+  
   if (!task) return null;
   
   const category = getCategory(task.categoryId);
@@ -71,7 +81,7 @@ export function TaskDetail({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent className="sm:max-w-md">
           <SheetHeader>
-            <SheetTitle className="pb-2">{task.title}</SheetTitle>
+            <SheetTitle className="pb-2 text-xl font-semibold">{task.title}</SheetTitle>
           </SheetHeader>
           
           <div className="flex flex-col gap-4 py-4">
@@ -82,12 +92,12 @@ export function TaskDetail({
             </div>
             
             <div className="grid gap-2 pt-2">
-              <label className="text-sm font-medium">Status</label>
+              <label className="text-sm font-medium text-foreground">Status</label>
               <Select
                 value={task.status}
                 onValueChange={handleStatusChange}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full bg-background border-input focus:ring-primary/30">
                   <SelectValue placeholder="Select a status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -109,15 +119,15 @@ export function TaskDetail({
             </div>
             
             {task.dueDate && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-3 py-2 rounded-md">
                 <CalendarIcon className="h-4 w-4" />
                 <span>Due {formatDate(task.dueDate)}</span>
               </div>
             )}
             
-            <div className="mt-4">
+            <div className="mt-4 bg-muted/30 px-4 py-3 rounded-md">
               {task.description ? (
-                <p className="text-sm text-muted-foreground">{task.description}</p>
+                <p className="text-sm text-foreground/90">{task.description}</p>
               ) : (
                 <p className="text-sm italic text-muted-foreground">No description</p>
               )}
@@ -128,6 +138,7 @@ export function TaskDetail({
             <Button
               variant="outline"
               onClick={() => toggleTaskCompletion(task.id)}
+              className="border-input hover:bg-muted"
             >
               {task.completed ? 'Mark as Incomplete' : 'Mark as Complete'}
             </Button>
@@ -138,11 +149,12 @@ export function TaskDetail({
               variant="outline"
               size="icon"
               onClick={() => setDeleteDialogOpen(true)}
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
             >
               <Trash className="h-4 w-4" />
             </Button>
             
-            <Button onClick={() => onEdit(task.id)}>
+            <Button onClick={() => onEdit(task.id)} className="bg-primary hover:bg-primary/90">
               <Pencil className="mr-2 h-4 w-4" />
               Edit Task
             </Button>
@@ -152,7 +164,7 @@ export function TaskDetail({
       
       {/* Delete Task Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-background border-border">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Task</AlertDialogTitle>
             <AlertDialogDescription>

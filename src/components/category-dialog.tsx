@@ -44,16 +44,20 @@ export function CategoryDialog({
 }: CategoryDialogProps) {
   const { addCategory, updateCategory } = useAppStore();
   const [category, setCategory] = useState<Omit<Category, 'id'>>(defaultCategory);
+  const [formKey, setFormKey] = useState(Date.now()); // Used to force re-render
   
   // Reset form when dialog opens/closes or initialCategory changes
   useEffect(() => {
-    if (initialCategory) {
-      setCategory({
-        name: initialCategory.name,
-        color: initialCategory.color,
-      });
-    } else {
-      setCategory(defaultCategory);
+    if (open) {
+      if (initialCategory) {
+        setCategory({
+          name: initialCategory.name,
+          color: initialCategory.color,
+        });
+      } else {
+        setCategory(defaultCategory);
+      }
+      setFormKey(Date.now()); // Force re-render when dialog opens
     }
   }, [initialCategory, open]);
   
@@ -76,32 +80,36 @@ export function CategoryDialog({
     onOpenChange(false);
   };
   
+  const handleClose = () => {
+    onOpenChange(false);
+  };
+  
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit}>
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[425px] bg-background">
+        <form onSubmit={handleSubmit} key={formKey}>
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="text-xl">
               {initialCategory ? 'Edit Category' : 'Create Category'}
             </DialogTitle>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name" className="text-foreground/80">Name</Label>
               <Input
                 id="name"
                 value={category.name}
                 onChange={(e) => setCategory({ ...category, name: e.target.value })}
                 placeholder="Category name"
-                className="w-full"
+                className="w-full bg-background border-input focus-visible:ring-primary/30"
                 autoFocus
                 required
               />
             </div>
             
             <div className="grid gap-2">
-              <Label>Color</Label>
+              <Label className="text-foreground/80">Color</Label>
               <div className="flex flex-wrap gap-2">
                 {colorOptions.map((color) => (
                   <button
@@ -109,7 +117,7 @@ export function CategoryDialog({
                     type="button"
                     className={cn(
                       'h-8 w-8 rounded-full border-2 transition-all',
-                      category.color === color ? 'border-gray-900 scale-110' : 'border-transparent hover:scale-105'
+                      category.color === color ? 'border-foreground scale-110 shadow-md' : 'border-transparent hover:scale-105'
                     )}
                     style={{ backgroundColor: color }}
                     onClick={() => setCategory({ ...category, color })}
@@ -119,8 +127,8 @@ export function CategoryDialog({
             </div>
             
             <div className="mt-2">
-              <Label>Preview</Label>
-              <div className="flex items-center mt-2 gap-2">
+              <Label className="text-foreground/80">Preview</Label>
+              <div className="flex items-center mt-2 gap-2 bg-muted/30 p-3 rounded-md">
                 <div
                   className="h-4 w-4 rounded-full"
                   style={{ backgroundColor: category.color }}
@@ -139,7 +147,10 @@ export function CategoryDialog({
           </div>
           
           <DialogFooter>
-            <Button type="submit">
+            <Button type="button" variant="outline" onClick={handleClose} className="border-input">
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-primary hover:bg-primary/90">
               {initialCategory ? 'Update Category' : 'Create Category'}
             </Button>
           </DialogFooter>
