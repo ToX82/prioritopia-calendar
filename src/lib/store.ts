@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { AppState, Category, Priority, Task, TaskStatus, TaskStatusConfig, ViewMode } from './types';
@@ -42,6 +43,7 @@ type AppStore = AppState & {
   addStatus: (status: Omit<TaskStatusConfig, 'id'>) => void;
   updateStatus: (statusId: string, updates: Partial<TaskStatusConfig>) => void;
   deleteStatus: (statusId: string) => void;
+  reorderStatuses: (statusId: string, newOrder: number) => void;
   
   // View actions
   setViewMode: (mode: ViewMode) => void;
@@ -138,15 +140,19 @@ export const useAppStore = create<AppStore>()(
       })),
       
       deleteStatus: (statusId) => set((state) => {
-        // We can't delete default statuses
-        if (['new', 'in-progress', 'testing', 'awaiting-feedback', 'completed'].includes(statusId)) {
+        // Now we can delete even default statuses
+        // Find the default status to redirect tasks to
+        const fallbackStatus = state.statuses.find(s => s.id !== statusId) || null;
+        
+        if (!fallbackStatus) {
+          // Don't delete if it's the only status
           return state;
         }
         
-        // Update tasks with this status to have 'new' status
+        // Update tasks with this status to have fallback status
         const updatedTasks = state.tasks.map((task) => {
           if (task.status === statusId) {
-            return { ...task, status: 'new' as TaskStatus };
+            return { ...task, status: fallbackStatus.id as TaskStatus };
           }
           return task;
         });
@@ -154,6 +160,39 @@ export const useAppStore = create<AppStore>()(
         return {
           statuses: state.statuses.filter((status) => status.id !== statusId),
           tasks: updatedTasks,
+        };
+      }),
+      
+      reorderStatuses: (statusId, newOrder) => set((state) => {
+        const targetStatus = state.statuses.find(s => s.id === statusId);
+        if (!targetStatus) return state;
+        
+        const oldOrder = targetStatus.order;
+        
+        // Get all statuses except the one being moved
+        const otherStatuses = state.statuses.filter(s => s.id !== statusId);
+        
+        // Adjust other statuses' orders
+        const updatedStatuses = otherStatuses.map(status => {
+          if (oldOrder < newOrder) {
+            // Moving down: decrement orders for statuses between old and new
+            if (status.order > oldOrder && status.order <= newOrder) {
+              return { ...status, order: status.order - 1 };
+            }
+          } else if (oldOrder > newOrder) {
+            // Moving up: increment orders for statuses between new and old
+            if (status.order >= newOrder && status.order < oldOrder) {
+              return { ...status, order: status.order + 1 };
+            }
+          }
+          return status;
+        });
+        
+        // Update the moved status with new order
+        const updatedTargetStatus = { ...targetStatus, order: newOrder };
+        
+        return {
+          statuses: [...updatedStatuses, updatedTargetStatus].sort((a, b) => a.order - b.order),
         };
       }),
       

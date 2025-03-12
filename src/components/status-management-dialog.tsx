@@ -23,8 +23,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Edit, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, Edit, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface StatusManagementDialogProps {
   open: boolean;
@@ -35,7 +36,7 @@ export function StatusManagementDialog({
   open,
   onOpenChange,
 }: StatusManagementDialogProps) {
-  const { statuses, addStatus, updateStatus, deleteStatus } = useAppStore();
+  const { statuses, addStatus, updateStatus, deleteStatus, reorderStatuses } = useAppStore();
   const [editingStatus, setEditingStatus] = useState<TaskStatusConfig | null>(null);
   const [newStatus, setNewStatus] = useState<Omit<TaskStatusConfig, 'id'>>({
     name: '',
@@ -45,14 +46,17 @@ export function StatusManagementDialog({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusToDelete, setStatusToDelete] = useState<string | null>(null);
   const [formKey, setFormKey] = useState(Date.now()); // Used to force re-render
+  const [orderedStatuses, setOrderedStatuses] = useState<TaskStatusConfig[]>([]);
 
   // Reset the form when the dialog opens
   useEffect(() => {
     if (open) {
       resetForm();
       setFormKey(Date.now());
+      const sorted = [...statuses].sort((a, b) => a.order - b.order);
+      setOrderedStatuses(sorted);
     }
-  }, [open]);
+  }, [open, statuses]);
 
   // Get next available order
   const getNextOrder = () => {
@@ -99,6 +103,11 @@ export function StatusManagementDialog({
   };
 
   const handleDeleteStatus = (statusId: string) => {
+    if (statuses.length <= 1) {
+      toast.error('Cannot delete the last status');
+      return;
+    }
+    
     setStatusToDelete(statusId);
     setDeleteDialogOpen(true);
   };
@@ -121,8 +130,19 @@ export function StatusManagementDialog({
     onOpenChange(false);
   };
 
-  const isDefaultStatus = (statusId: string) => {
-    return ['new', 'in-progress', 'testing', 'awaiting-feedback', 'completed'].includes(statusId);
+  const handleMoveUp = (status: TaskStatusConfig) => {
+    if (status.order > 0) {
+      reorderStatuses(status.id, status.order - 1);
+      toast.success(`Moved ${status.name} up`);
+    }
+  };
+
+  const handleMoveDown = (status: TaskStatusConfig) => {
+    const maxOrder = statuses.length - 1;
+    if (status.order < maxOrder) {
+      reorderStatuses(status.id, status.order + 1);
+      toast.success(`Moved ${status.name} down`);
+    }
   };
 
   return (
@@ -132,7 +152,7 @@ export function StatusManagementDialog({
           <DialogHeader>
             <DialogTitle className="text-xl">Manage Task Statuses</DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              Add, edit, or remove task statuses. Default statuses cannot be deleted.
+              Add, edit, reorder or remove task statuses as needed. Changes affect task organization.
             </DialogDescription>
           </DialogHeader>
 
@@ -145,54 +165,87 @@ export function StatusManagementDialog({
               </div>
 
               <div className="max-h-[200px] overflow-y-auto pr-2 space-y-2">
-                {statuses
-                  .sort((a, b) => a.order - b.order)
-                  .map((status) => (
-                    <div key={status.id} className="grid grid-cols-[1fr,120px,auto] gap-2 items-center bg-muted/30 p-2 rounded-md">
-                      <div className="flex items-center gap-2">
+                <AnimatePresence>
+                  {[...statuses]
+                    .sort((a, b) => a.order - b.order)
+                    .map((status) => (
+                      <motion.div
+                        key={status.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="grid grid-cols-[1fr,120px,auto] gap-2 items-center bg-muted/30 p-2 rounded-md"
+                      >
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: status.color }}
+                          />
+                          <span>{status.name}</span>
+                        </div>
                         <div
-                          className="h-3 w-3 rounded-full"
+                          className="w-full h-8 rounded-md border border-input cursor-pointer"
                           style={{ backgroundColor: status.color }}
-                        />
-                        <span>{status.name}</span>
-                        {isDefaultStatus(status.id) && (
-                          <span className="text-xs text-muted-foreground ml-1">(Default)</span>
-                        )}
-                      </div>
-                      <div
-                        className="w-full h-8 rounded-md border border-input cursor-pointer"
-                        style={{ backgroundColor: status.color }}
-                        onClick={() => handleEditStatus(status)}
-                      />
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
                           onClick={() => handleEditStatus(status)}
-                          disabled={isDefaultStatus(status.id)}
-                          className="h-8 w-8"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteStatus(status.id)}
-                          disabled={isDefaultStatus(status.id)}
-                          className="text-destructive hover:text-destructive h-8 w-8"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                        />
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleMoveUp(status)}
+                            disabled={status.order === 0}
+                            className="h-8 w-8 transition-opacity hover:opacity-100"
+                            title="Move up"
+                          >
+                            <ArrowUp className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleMoveDown(status)}
+                            disabled={status.order === statuses.length - 1}
+                            className="h-8 w-8 transition-opacity hover:opacity-100"
+                            title="Move down"
+                          >
+                            <ArrowDown className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleEditStatus(status)}
+                            className="h-8 w-8"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeleteStatus(status.id)}
+                            disabled={statuses.length <= 1}
+                            className="text-destructive hover:text-destructive h-8 w-8"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </motion.div>
+                    ))}
+                </AnimatePresence>
               </div>
             </div>
 
             <div className="border-t pt-4 mt-4">
               <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
                 {editingStatus ? 'Edit Status' : 'Add New Status'}
-                {editingStatus && <span className="text-xs bg-muted px-2 py-0.5 rounded-full">Editing: {editingStatus.name}</span>}
+                {editingStatus && (
+                  <motion.span 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="text-xs bg-muted px-2 py-0.5 rounded-full"
+                  >
+                    Editing: {editingStatus.name}
+                  </motion.span>
+                )}
               </h3>
               <div className="grid gap-4">
                 <div className="grid grid-cols-[1fr,120px] gap-2">
@@ -223,7 +276,10 @@ export function StatusManagementDialog({
                       Cancel
                     </Button>
                   )}
-                  <Button onClick={handleAddStatus} className="bg-primary hover:bg-primary/90">
+                  <Button 
+                    onClick={handleAddStatus} 
+                    className="bg-primary hover:bg-primary/90 transition-colors"
+                  >
                     {editingStatus ? 'Update' : 'Add'} Status
                   </Button>
                 </div>
@@ -238,7 +294,7 @@ export function StatusManagementDialog({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Status</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this status? Tasks with this status will be moved to "New" status.
+              Are you sure you want to delete this status? Tasks with this status will be moved to another available status.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

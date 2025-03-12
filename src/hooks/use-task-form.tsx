@@ -18,6 +18,9 @@ export function useTaskForm(initialTask: Task | null, onClose: () => void) {
 
   // Reset form when dialog opens/closes or initialTask changes
   useEffect(() => {
+    // Check for pre-selected status from Kanban view
+    const preSelectedStatus = localStorage.getItem('preSelectedStatus');
+    
     if (initialTask) {
       setTask({
         title: initialTask.title,
@@ -42,9 +45,14 @@ export function useTaskForm(initialTask: Task | null, onClose: () => void) {
         dueDate: null,
         priority: 'medium',
         categoryId: null,
-        status: 'new',
+        status: preSelectedStatus as TaskStatus || 'new',
       });
       setDate(undefined);
+    }
+    
+    // Clear pre-selected status after using it
+    if (preSelectedStatus) {
+      localStorage.removeItem('preSelectedStatus');
     }
   }, [initialTask]);
 

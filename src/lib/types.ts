@@ -1,7 +1,8 @@
 
 export type Priority = 'low' | 'medium' | 'high';
 
-export type TaskStatus = 'new' | 'in-progress' | 'testing' | 'awaiting-feedback' | 'completed';
+// Changed from specific string literals to string to allow dynamic statuses
+export type TaskStatus = string;
 
 export type Category = {
   id: string;
