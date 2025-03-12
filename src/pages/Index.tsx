@@ -5,7 +5,7 @@ import { AppHeader } from '@/components/app-header';
 import { AppSidebar } from '@/components/app-sidebar';
 import { NewTaskDialog } from '@/components/new-task-dialog';
 import { TaskDetail } from '@/components/task-detail';
-import { CategoryDialog } from '@/components/category-dialog';
+import { CategoryManagementDialog } from '@/components/category-management-dialog';
 import { StatusManagementDialog } from '@/components/status-management-dialog';
 import { TaskViewContainer } from '@/components/task-view-container';
 import { useTaskManager } from '@/hooks/use-task-manager';
@@ -90,7 +90,7 @@ const Index = () => {
           onEdit={handleEditTask}
         />
 
-        <CategoryDialog
+        <CategoryManagementDialog
           open={categoryManagementOpen}
           onOpenChange={setCategoryManagementOpen}
         />

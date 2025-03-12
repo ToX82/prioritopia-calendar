@@ -1,7 +1,7 @@
 
 import { useAppStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
-import { Category, ViewMode } from '@/lib/types';
+import { ViewMode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import {
   Sheet,
@@ -15,13 +15,11 @@ import {
   MenuIcon, 
   LayoutGridIcon, 
   XIcon, 
-  KanbanIcon
+  KanbanIcon,
+  Tag
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CategoryItem } from './category-item';
-import { CategoryDialog } from './category-dialog';
-import { DeleteCategoryDialog } from './delete-category-dialog';
 
 interface AppSidebarProps {
   selectedCategoryId: string | null;
@@ -41,30 +39,7 @@ export function AppSidebar({
   onChangeViewMode
 }: AppSidebarProps) {
   const [open, setOpen] = useState(false);
-  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
-  const [deleteCategoryDialogOpen, setDeleteCategoryDialogOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [categoryToDelete, setCategoryToDelete] = useState<{ id: string, name: string } | null>(null);
-  
   const { categories } = useAppStore();
-  
-  const handleAddCategory = () => {
-    setEditingCategory(null);
-    setCategoryDialogOpen(true);
-  };
-  
-  const handleEditCategory = (category: Category) => {
-    setEditingCategory(category);
-    setCategoryDialogOpen(true);
-  };
-  
-  const handleDeleteCategory = (categoryId: string) => {
-    const category = categories.find(c => c.id === categoryId);
-    if (category) {
-      setCategoryToDelete({ id: category.id, name: category.name });
-      setDeleteCategoryDialogOpen(true);
-    }
-  };
   
   return (
     <>
@@ -87,9 +62,6 @@ export function AppSidebar({
               onSelectCategory(categoryId);
               setOpen(false);
             }}
-            onAddCategory={handleAddCategory}
-            onEditCategory={handleEditCategory}
-            onDeleteCategory={handleDeleteCategory}
             onManageCategories={onManageCategories}
             onManageStatuses={onManageStatuses}
             viewMode={viewMode}
@@ -108,9 +80,6 @@ export function AppSidebar({
             categories={categories}
             selectedCategoryId={selectedCategoryId}
             onSelectCategory={onSelectCategory}
-            onAddCategory={handleAddCategory}
-            onEditCategory={handleEditCategory}
-            onDeleteCategory={handleDeleteCategory}
             onManageCategories={onManageCategories}
             onManageStatuses={onManageStatuses}
             viewMode={viewMode}
@@ -118,34 +87,14 @@ export function AppSidebar({
           />
         </div>
       </aside>
-      
-      {/* Category Dialog */}
-      <CategoryDialog
-        open={categoryDialogOpen}
-        onOpenChange={setCategoryDialogOpen}
-        initialCategory={editingCategory}
-      />
-      
-      {/* Delete Category Dialog */}
-      {categoryToDelete && (
-        <DeleteCategoryDialog
-          categoryId={categoryToDelete.id}
-          categoryName={categoryToDelete.name}
-          open={deleteCategoryDialogOpen}
-          onOpenChange={setDeleteCategoryDialogOpen}
-        />
-      )}
     </>
   );
 }
 
 interface SidebarContentProps {
-  categories: Category[];
+  categories: any[];
   selectedCategoryId: string | null;
   onSelectCategory: (categoryId: string | null) => void;
-  onAddCategory: () => void;
-  onEditCategory: (category: Category) => void;
-  onDeleteCategory: (categoryId: string) => void;
   onManageCategories: () => void;
   onManageStatuses: () => void;
   viewMode: ViewMode;
@@ -156,9 +105,6 @@ function SidebarContent({
   categories,
   selectedCategoryId,
   onSelectCategory,
-  onAddCategory,
-  onEditCategory,
-  onDeleteCategory,
   onManageCategories,
   onManageStatuses,
   viewMode,
@@ -217,15 +163,6 @@ function SidebarContent({
       <div className="mt-8 px-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-muted-foreground">Categories</h3>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-5 w-5"
-            onClick={onAddCategory}
-          >
-            <PlusIcon className="h-4 w-4" />
-            <span className="sr-only">Add Category</span>
-          </Button>
         </div>
         
         <div className="mt-2 space-y-1">
@@ -244,14 +181,21 @@ function SidebarContent({
           {categories.length > 0 ? (
             <motion.div layout className="space-y-1">
               {categories.map((category) => (
-                <CategoryItem
+                <Button
                   key={category.id}
-                  category={category}
-                  isSelected={selectedCategoryId === category.id}
-                  onSelect={onSelectCategory}
-                  onEdit={onEditCategory}
-                  onDelete={onDeleteCategory}
-                />
+                  variant="ghost"
+                  className={cn(
+                    'w-full justify-start',
+                    selectedCategoryId === category.id && 'bg-accent'
+                  )}
+                  onClick={() => onSelectCategory(category.id)}
+                >
+                  <div
+                    className="mr-2 h-3 w-3 rounded-full"
+                    style={{ backgroundColor: category.color }}
+                  />
+                  <span className="truncate">{category.name}</span>
+                </Button>
               ))}
             </motion.div>
           ) : (
@@ -269,6 +213,7 @@ function SidebarContent({
             className="w-full justify-start"
             onClick={onManageCategories}
           >
+            <Tag className="mr-2 h-4 w-4" />
             <span>Manage Categories</span>
           </Button>
           <Button
@@ -276,6 +221,7 @@ function SidebarContent({
             className="w-full justify-start"
             onClick={onManageStatuses}
           >
+            <KanbanIcon className="mr-2 h-4 w-4" />
             <span>Manage Statuses</span>
           </Button>
         </div>
