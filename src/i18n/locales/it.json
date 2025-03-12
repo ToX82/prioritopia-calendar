@@ -1,0 +1,75 @@
+
+{
+  "app": {
+    "title": "Gestione Attività",
+    "addTask": "Aggiungi Attività",
+    "search": "Cerca attività...",
+    "categories": "Categorie",
+    "allTasks": "Tutte le Attività",
+    "noCategories": "Nessuna categoria",
+    "manageCategories": "Gestisci Categorie",
+    "manageStatuses": "Gestisci Stati"
+  },
+  "views": {
+    "list": "Vista Lista",
+    "calendar": "Vista Calendario",
+    "kanban": "Vista Kanban"
+  },
+  "task": {
+    "title": "Titolo attività",
+    "description": "Descrizione attività (opzionale)",
+    "status": "Stato",
+    "priority": {
+      "label": "Priorità",
+      "low": "Bassa",
+      "medium": "Media",
+      "high": "Alta"
+    },
+    "category": "Categoria",
+    "noCategory": "Nessuna Categoria",
+    "dueDate": "Data Scadenza",
+    "selectDate": "Seleziona una data di scadenza",
+    "completed": "Segna come completata",
+    "create": "Crea Attività",
+    "update": "Aggiorna Attività",
+    "delete": "Elimina Attività",
+    "confirmDelete": "Sei sicuro di voler eliminare questa attività?"
+  },
+  "categories": {
+    "title": "Gestione Categorie",
+    "description": "Aggiungi, modifica o rimuovi categorie per organizzare le tue attività.",
+    "name": "Nome",
+    "color": "Colore",
+    "add": "Aggiungi Categoria",
+    "update": "Aggiorna Categoria",
+    "delete": "Elimina Categoria",
+    "confirmDelete": "Sei sicuro di voler eliminare questa categoria? Tutte le attività assegnate a questa categoria verranno spostate in \"Nessuna Categoria\"."
+  },
+  "statuses": {
+    "title": "Gestione Stati Attività",
+    "description": "Aggiungi, modifica, riordina o rimuovi gli stati delle attività secondo necessità. Le modifiche influenzano l'organizzazione delle attività.",
+    "name": "Nome",
+    "color": "Colore",
+    "add": "Aggiungi Stato",
+    "update": "Aggiorna Stato",
+    "delete": "Elimina Stato",
+    "confirmDelete": "Sei sicuro di voler eliminare questo stato? Le attività con questo stato verranno spostate in un altro stato disponibile."
+  },
+  "common": {
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "save": "Salva",
+    "clear": "Cancella"
+  },
+  "language": {
+    "label": "Lingua",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
+    "de": "Deutsch",
+    "es": "Español",
+    "pt": "Português",
+    "zh": "中文"
+  }
+}
