@@ -29,11 +29,13 @@ export function TaskViewContainer({
   const ViewComponent = views[viewMode];
 
   return (
-    <ViewComponent
-      tasks={tasks}
-      onTaskClick={onTaskClick}
-      onToggleComplete={onToggleComplete}
-      onAddTask={onAddTask}
-    />
+    <div className="h-full w-full overflow-hidden rounded-lg border bg-card">
+      <ViewComponent
+        tasks={tasks}
+        onTaskClick={onTaskClick}
+        onToggleComplete={onToggleComplete}
+        onAddTask={onAddTask}
+      />
+    </div>
   );
 }

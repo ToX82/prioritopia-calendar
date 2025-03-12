@@ -27,15 +27,19 @@ export function LanguageSelector() {
       value={i18n.language}
       onValueChange={(value) => i18n.changeLanguage(value)}
     >
-      <SelectTrigger className="w-[140px]">
+      <SelectTrigger className="h-9 w-[140px] border-border bg-background/50 hover:bg-accent">
         <div className="flex items-center gap-2">
-          <Globe className="h-4 w-4" />
+          <Globe className="h-4 w-4 text-muted-foreground" />
           <SelectValue placeholder={t('language.label')} />
         </div>
       </SelectTrigger>
       <SelectContent>
         {languages.map((lang) => (
-          <SelectItem key={lang.code} value={lang.code}>
+          <SelectItem 
+            key={lang.code} 
+            value={lang.code}
+            className="cursor-pointer hover:bg-accent"
+          >
             {lang.name}
           </SelectItem>
         ))}
