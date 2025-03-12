@@ -1,7 +1,6 @@
 
 import { Task } from '@/lib/types';
 import { ListIcon, CalendarIcon, KanbanIcon } from 'lucide-react';
-import { ListIcon, CalendarIcon, KanbanIcon } from 'lucide-react';
 import { ListView } from './list-view';
 import { CalendarView } from './calendar-view';
 import { KanbanView } from './kanban-view';
