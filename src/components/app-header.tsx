@@ -3,6 +3,7 @@ import { useAppStore } from '@/lib/store';
 import { ViewMode } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { CalendarIcon, ListIcon, PlusIcon, Search, KanbanIcon } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -37,7 +38,9 @@ export function AppHeader({ onAddTask, onSearch }: AppHeaderProps) {
         <h1 className="text-xl font-semibold sm:text-2xl bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Task Manager</h1>
         
         <div className="flex items-center gap-2">
-          <div className="bg-muted/50 rounded-lg p-1 flex items-center gap-1">
+          <ThemeToggle />
+          
+          <div className="bg-muted rounded-lg p-1 flex items-center gap-1">
             <Button
               variant={viewMode === 'list' ? 'default' : 'ghost'}
               size="icon"
@@ -69,7 +72,7 @@ export function AppHeader({ onAddTask, onSearch }: AppHeaderProps) {
             </Button>
           </div>
           
-          <Button onClick={onAddTask} size="sm" className="bg-primary hover:bg-primary/90 text-white shadow-sm">
+          <Button onClick={onAddTask} size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm">
             <PlusIcon className="mr-1 h-4 w-4" />
             <span className="hidden sm:inline">Add Task</span>
             <span className="sm:hidden">Add</span>
@@ -83,7 +86,7 @@ export function AppHeader({ onAddTask, onSearch }: AppHeaderProps) {
           <Input
             type="text"
             placeholder="Search tasks..."
-            className="pl-9 border-muted bg-background/50 focus-visible:ring-primary/30 w-full"
+            className="pl-9 bg-background/50 focus-visible:ring-primary/30 w-full"
             value={searchQuery}
             onChange={handleSearchChange}
           />
