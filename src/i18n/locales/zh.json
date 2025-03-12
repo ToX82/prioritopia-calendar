@@ -1,0 +1,75 @@
+
+{
+  "app": {
+    "title": "任务管理器",
+    "addTask": "添加任务",
+    "search": "搜索任务...",
+    "categories": "分类",
+    "allTasks": "所有任务",
+    "noCategories": "无分类",
+    "manageCategories": "管理分类",
+    "manageStatuses": "管理状态"
+  },
+  "views": {
+    "list": "列表视图",
+    "calendar": "日历视图",
+    "kanban": "看板视图"
+  },
+  "task": {
+    "title": "任务标题",
+    "description": "任务描述（可选）",
+    "status": "状态",
+    "priority": {
+      "label": "优先级",
+      "low": "低",
+      "medium": "中",
+      "high": "高"
+    },
+    "category": "分类",
+    "noCategory": "无分类",
+    "dueDate": "截止日期",
+    "selectDate": "选择截止日期",
+    "completed": "标记为已完成",
+    "create": "创建任务",
+    "update": "更新任务",
+    "delete": "删除任务",
+    "confirmDelete": "您确定要删除此任务吗？"
+  },
+  "categories": {
+    "title": "管理分类",
+    "description": "添加、编辑或删除分类以组织您的任务。",
+    "name": "名称",
+    "color": "颜色",
+    "add": "添加分类",
+    "update": "更新分类",
+    "delete": "删除分类",
+    "confirmDelete": "您确定要删除此分类吗？所有关联的任务将被移动到"无分类"。"
+  },
+  "statuses": {
+    "title": "管理状态",
+    "description": "根据需要添加、编辑、重新排序或删除任务状态。更改会影响任务组织。",
+    "name": "名称",
+    "color": "颜色",
+    "add": "添加状态",
+    "update": "更新状态",
+    "delete": "删除状态",
+    "confirmDelete": "您确定要删除此状态吗？具有此状态的任务将被移动到其他可用状态。"
+  },
+  "common": {
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "save": "保存",
+    "clear": "清除"
+  },
+  "language": {
+    "label": "语言",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
+    "de": "Deutsch",
+    "es": "Español",
+    "pt": "Português",
+    "zh": "中文"
+  }
+}

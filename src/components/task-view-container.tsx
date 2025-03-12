@@ -1,12 +1,13 @@
 
-import { ReactNode } from 'react';
-import { ViewMode, Task } from '@/lib/types';
-import { ListView } from '@/components/list-view';
-import { CalendarView } from '@/components/calendar-view';
-import { KanbanView } from '@/components/kanban-view';
+import { Task } from '@/lib/types';
+import { ListIcon, CalendarIcon, KanbanIcon } from 'lucide-react';
+import { ListIcon, CalendarIcon, KanbanIcon } from 'lucide-react';
+import { ListView } from './list-view';
+import { CalendarView } from './calendar-view';
+import { KanbanView } from './kanban-view';
 
 interface TaskViewContainerProps {
-  viewMode: ViewMode;
+  viewMode: 'list' | 'calendar' | 'kanban';
   tasks: Task[];
   onTaskClick: (taskId: string) => void;
   onToggleComplete: (taskId: string) => void;
@@ -19,34 +20,21 @@ export function TaskViewContainer({
   onTaskClick,
   onToggleComplete,
   onAddTask,
-}: TaskViewContainerProps): ReactNode {
-  switch (viewMode) {
-    case 'calendar':
-      return (
-        <CalendarView
-          tasks={tasks}
-          onTaskClick={onTaskClick}
-          onToggleComplete={onToggleComplete}
-          onAddTask={onAddTask}
-        />
-      );
-    case 'kanban':
-      return (
-        <KanbanView
-          tasks={tasks}
-          onTaskClick={onTaskClick}
-          onToggleComplete={onToggleComplete}
-          onAddTask={onAddTask}
-        />
-      );
-    default:
-      return (
-        <ListView
-          tasks={tasks}
-          onTaskClick={onTaskClick}
-          onToggleComplete={onToggleComplete}
-          onAddTask={onAddTask}
-        />
-      );
-  }
+}: TaskViewContainerProps) {
+  const views = {
+    list: ListView,
+    calendar: CalendarView,
+    kanban: KanbanView,
+  };
+
+  const ViewComponent = views[viewMode];
+
+  return (
+    <ViewComponent
+      tasks={tasks}
+      onTaskClick={onTaskClick}
+      onToggleComplete={onToggleComplete}
+      onAddTask={onAddTask}
+    />
+  );
 }

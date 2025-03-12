@@ -1,0 +1,75 @@
+
+{
+  "app": {
+    "title": "Gerenciador de Tarefas",
+    "addTask": "Adicionar Tarefa",
+    "search": "Pesquisar tarefas...",
+    "categories": "Categorias",
+    "allTasks": "Todas as Tarefas",
+    "noCategories": "Sem categorias",
+    "manageCategories": "Gerenciar Categorias",
+    "manageStatuses": "Gerenciar Status"
+  },
+  "views": {
+    "list": "Visualização em Lista",
+    "calendar": "Visualização em Calendário",
+    "kanban": "Visualização Kanban"
+  },
+  "task": {
+    "title": "Título da tarefa",
+    "description": "Descrição da tarefa (opcional)",
+    "status": "Status",
+    "priority": {
+      "label": "Prioridade",
+      "low": "Baixa",
+      "medium": "Média",
+      "high": "Alta"
+    },
+    "category": "Categoria",
+    "noCategory": "Sem Categoria",
+    "dueDate": "Data de vencimento",
+    "selectDate": "Selecionar data de vencimento",
+    "completed": "Marcar como concluída",
+    "create": "Criar Tarefa",
+    "update": "Atualizar Tarefa",
+    "delete": "Excluir Tarefa",
+    "confirmDelete": "Tem certeza que deseja excluir esta tarefa?"
+  },
+  "categories": {
+    "title": "Gerenciar Categorias",
+    "description": "Adicione, edite ou remova categorias para organizar suas tarefas.",
+    "name": "Nome",
+    "color": "Cor",
+    "add": "Adicionar Categoria",
+    "update": "Atualizar Categoria",
+    "delete": "Excluir Categoria",
+    "confirmDelete": "Tem certeza que deseja excluir esta categoria? Todas as tarefas associadas serão movidas para \"Sem Categoria\"."
+  },
+  "statuses": {
+    "title": "Gerenciar Status",
+    "description": "Adicione, edite, reordene ou remova status de tarefas conforme necessário. As alterações afetam a organização das tarefas.",
+    "name": "Nome",
+    "color": "Cor",
+    "add": "Adicionar Status",
+    "update": "Atualizar Status",
+    "delete": "Excluir Status",
+    "confirmDelete": "Tem certeza que deseja excluir este status? As tarefas com este status serão movidas para outro status disponível."
+  },
+  "common": {
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "save": "Salvar",
+    "clear": "Limpar"
+  },
+  "language": {
+    "label": "Idioma",
+    "en": "English",
+    "it": "Italiano",
+    "fr": "Français",
+    "de": "Deutsch",
+    "es": "Español",
+    "pt": "Português",
+    "zh": "中文"
+  }
+}
