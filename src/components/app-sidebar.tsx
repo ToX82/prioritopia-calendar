@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface AppSidebarProps {
   selectedCategoryId: string | null;
@@ -40,6 +41,7 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const [open, setOpen] = useState(false);
   const { categories } = useAppStore();
+  const { t } = useTranslation();
   
   return (
     <>
@@ -54,7 +56,7 @@ export function AppSidebar({
             <MenuIcon className="h-5 w-5" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" className="w-64 p-0 bg-sidebar border-sidebar-border">
           <SidebarContent
             categories={categories}
             selectedCategoryId={selectedCategoryId}
@@ -74,8 +76,8 @@ export function AppSidebar({
       </Sheet>
       
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col">
-        <div className="flex h-full flex-col border-r">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col bg-sidebar border-r border-sidebar-border">
+        <div className="flex h-full flex-col">
           <SidebarContent
             categories={categories}
             selectedCategoryId={selectedCategoryId}
@@ -110,10 +112,12 @@ function SidebarContent({
   viewMode,
   setViewMode,
 }: SidebarContentProps) {
+  const { t } = useTranslation();
+
   return (
-    <div className="flex h-full flex-col overflow-y-auto py-4">
+    <div className="flex h-full flex-col overflow-y-auto py-4 text-sidebar-foreground">
       <div className="flex items-center justify-between px-4">
-        <h2 className="text-lg font-semibold">Task Manager</h2>
+        <h2 className="text-lg font-semibold">{t('app.title')}</h2>
         <XIcon className="h-5 w-5 lg:hidden cursor-pointer" onClick={() => {
           const closeButton = document.querySelector('[data-radix-collection-item]');
           if (closeButton instanceof HTMLElement) {
@@ -126,56 +130,56 @@ function SidebarContent({
         <Button
           variant="ghost"
           className={cn(
-            'w-full justify-start',
-            viewMode === 'list' && 'bg-accent'
+            'w-full justify-start text-sidebar-foreground',
+            viewMode === 'list' && 'bg-sidebar-accent text-sidebar-accent-foreground'
           )}
           onClick={() => setViewMode('list')}
         >
           <ListIcon className="mr-2 h-4 w-4" />
-          <span>List View</span>
+          <span>{t('views.list')}</span>
         </Button>
         
         <Button
           variant="ghost"
           className={cn(
-            'w-full justify-start',
-            viewMode === 'calendar' && 'bg-accent'
+            'w-full justify-start text-sidebar-foreground',
+            viewMode === 'calendar' && 'bg-sidebar-accent text-sidebar-accent-foreground'
           )}
           onClick={() => setViewMode('calendar')}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          <span>Calendar View</span>
+          <span>{t('views.calendar')}</span>
         </Button>
 
         <Button
           variant="ghost"
           className={cn(
-            'w-full justify-start',
-            viewMode === 'kanban' && 'bg-accent'
+            'w-full justify-start text-sidebar-foreground',
+            viewMode === 'kanban' && 'bg-sidebar-accent text-sidebar-accent-foreground'
           )}
           onClick={() => setViewMode('kanban')}
         >
           <KanbanIcon className="mr-2 h-4 w-4" />
-          <span>Kanban View</span>
+          <span>{t('views.kanban')}</span>
         </Button>
       </div>
       
       <div className="mt-8 px-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium text-muted-foreground">Categories</h3>
+          <h3 className="text-sm font-medium text-sidebar-foreground/70">{t('app.categories')}</h3>
         </div>
         
         <div className="mt-2 space-y-1">
           <Button
             variant="ghost"
             className={cn(
-              'w-full justify-start',
-              selectedCategoryId === null && 'bg-accent'
+              'w-full justify-start text-sidebar-foreground',
+              selectedCategoryId === null && 'bg-sidebar-accent text-sidebar-accent-foreground'
             )}
             onClick={() => onSelectCategory(null)}
           >
             <LayoutGridIcon className="mr-2 h-4 w-4" />
-            <span>All Tasks</span>
+            <span>{t('app.allTasks')}</span>
           </Button>
           
           {categories.length > 0 ? (
@@ -185,8 +189,8 @@ function SidebarContent({
                   key={category.id}
                   variant="ghost"
                   className={cn(
-                    'w-full justify-start',
-                    selectedCategoryId === category.id && 'bg-accent'
+                    'w-full justify-start text-sidebar-foreground',
+                    selectedCategoryId === category.id && 'bg-sidebar-accent text-sidebar-accent-foreground'
                   )}
                   onClick={() => onSelectCategory(category.id)}
                 >
@@ -199,8 +203,8 @@ function SidebarContent({
               ))}
             </motion.div>
           ) : (
-            <div className="py-4 text-center text-sm text-muted-foreground">
-              No categories yet
+            <div className="py-4 text-center text-sm text-sidebar-foreground/50">
+              {t('app.noCategories')}
             </div>
           )}
         </div>
@@ -210,19 +214,19 @@ function SidebarContent({
         <div className="space-y-1">
           <Button
             variant="ghost"
-            className="w-full justify-start"
+            className="w-full justify-start text-sidebar-foreground"
             onClick={onManageCategories}
           >
             <Tag className="mr-2 h-4 w-4" />
-            <span>Manage Categories</span>
+            <span>{t('app.manageCategories')}</span>
           </Button>
           <Button
             variant="ghost"
-            className="w-full justify-start"
+            className="w-full justify-start text-sidebar-foreground"
             onClick={onManageStatuses}
           >
             <KanbanIcon className="mr-2 h-4 w-4" />
-            <span>Manage Statuses</span>
+            <span>{t('app.manageStatuses')}</span>
           </Button>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { getOrderedStatuses, useAppStore } from '@/lib/store';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from './ui/button';
 import { Plus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface KanbanViewProps {
   tasks: Task[];
@@ -23,6 +24,7 @@ export function KanbanView({
 }: KanbanViewProps) {
   const { updateTask } = useAppStore();
   const statuses = getOrderedStatuses();
+  const { t } = useTranslation();
 
   // Group tasks by status
   const tasksByStatus = useMemo(() => {
@@ -52,19 +54,19 @@ export function KanbanView({
   // Handle drag-and-drop
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.currentTarget.classList.add('bg-secondary');
+    e.currentTarget.classList.add('bg-secondary/70');
   };
   
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.currentTarget.classList.remove('bg-secondary');
+    e.currentTarget.classList.remove('bg-secondary/70');
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetStatus: string) => {
     e.preventDefault();
-    e.currentTarget.classList.remove('bg-secondary');
+    e.currentTarget.classList.remove('bg-secondary/70');
     const taskId = e.dataTransfer.getData('taskId');
     if (taskId) {
-      updateTask(taskId, { status: targetStatus as any });
+      updateTask(taskId, { status: targetStatus });
     }
   };
 
@@ -88,13 +90,13 @@ export function KanbanView({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
-              className="flex-shrink-0 w-80 flex flex-col bg-secondary/50 rounded-lg border border-secondary/30 shadow-sm"
+              className="flex-shrink-0 w-80 flex flex-col bg-secondary/30 dark:bg-secondary/20 rounded-lg border border-border shadow-sm"
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, status.id)}
             >
               <div 
-                className="p-3 font-medium flex items-center justify-between sticky top-0 bg-secondary/70 backdrop-blur-sm rounded-t-lg z-10 transition-colors"
+                className="p-3 font-medium flex items-center justify-between sticky top-0 bg-secondary/50 dark:bg-secondary/30 backdrop-blur-sm rounded-t-lg z-10"
                 style={{ color: status.color }}
               >
                 <div className="flex items-center gap-2">
@@ -104,12 +106,12 @@ export function KanbanView({
                   />
                   <span>{status.name}</span>
                 </div>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-secondary">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-secondary/70 dark:bg-secondary/40 text-foreground">
                   {tasksByStatus[status.id].length}
                 </span>
               </div>
               
-              <div className="flex-1 p-2 space-y-2 min-h-[200px] transition-colors">
+              <div className="flex-1 p-2 space-y-2 min-h-[200px]">
                 <AnimatePresence>
                   {tasksByStatus[status.id].map((task) => (
                     <motion.div
@@ -139,8 +141,8 @@ export function KanbanView({
                 </AnimatePresence>
                 
                 {tasksByStatus[status.id].length === 0 && (
-                  <div className="flex items-center justify-center h-20 border border-dashed border-secondary rounded-md my-4">
-                    <p className="text-sm text-muted-foreground">Drop tasks here</p>
+                  <div className="flex items-center justify-center h-20 border border-dashed border-muted-foreground/30 rounded-md my-4 text-muted-foreground/50">
+                    <p className="text-sm">Drop tasks here</p>
                   </div>
                 )}
               </div>
@@ -156,7 +158,7 @@ export function KanbanView({
                   }}
                 >
                   <Plus className="h-4 w-4 mr-1" />
-                  Add Task
+                  {t('app.addTask')}
                 </Button>
               </div>
             </motion.div>
